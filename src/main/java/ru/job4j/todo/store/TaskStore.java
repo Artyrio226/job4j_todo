@@ -39,13 +39,11 @@ public class TaskStore implements ITaskStore {
             session.beginTransaction();
             rsl = session.createQuery("""
                                      UPDATE Task
-                                      SET title = :fTitle, description = :fDescription,
-                                      created = :fCreated, done = :fDone
+                                      SET title = :fTitle, description = :fDescription, done = :fDone
                                       WHERE id = :fId
                                      """)
                     .setParameter("fTitle", task.getTitle())
                     .setParameter("fDescription", task.getDescription())
-                    .setParameter("fCreated", task.getCreated())
                     .setParameter("fDone", task.isDone())
                     .setParameter("fId", task.getId())
                     .executeUpdate() > 0;
