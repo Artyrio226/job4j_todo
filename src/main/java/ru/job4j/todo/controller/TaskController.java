@@ -5,33 +5,29 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
-import ru.job4j.todo.service.TaskService;
+import ru.job4j.todo.service.SimpleTaskService;
 
 @Controller
 @AllArgsConstructor
 @RequestMapping("/tasks")
 public class TaskController {
-    private final TaskService taskService;
+    private final SimpleTaskService simpleTaskService;
 
     @GetMapping("/create")
     public String getCreationPage(Model model) {
-        model.addAttribute("tasks", taskService.findAll());
+        model.addAttribute("tasks", simpleTaskService.findAll());
         return "tasks/create";
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute Task task, Model model) {
-        if (task.getTitle().isEmpty() || task.getDescription().isEmpty()) {
-            model.addAttribute("message", "Название или описание не заполнено.");
-            return "errors/404";
-        }
-        taskService.save(task);
+    public String create(@ModelAttribute Task task) {
+        simpleTaskService.save(task);
         return "redirect:/";
     }
 
     @GetMapping("/{id}")
     public String getById(Model model, @PathVariable int id) {
-        var taskOptional = taskService.findById(id);
+        var taskOptional = simpleTaskService.findById(id);
         if (taskOptional.isEmpty()) {
             model.addAttribute("message", "Задание с указанным идентификатором не найдено");
             return "errors/404";
@@ -42,7 +38,7 @@ public class TaskController {
 
     @GetMapping("/update/{id}")
     public String getUpdatePage(Model model, @PathVariable int id) {
-        var taskOptional = taskService.findById(id);
+        var taskOptional = simpleTaskService.findById(id);
         if (taskOptional.isEmpty()) {
             model.addAttribute("message", "Задание с указанным идентификатором не найдено");
             return "errors/404";
@@ -53,22 +49,17 @@ public class TaskController {
 
     @PostMapping("/update")
     public String update(@ModelAttribute Task task, Model model) {
-        try {
-            var isUpdated = taskService.update(task);
-            if (!isUpdated) {
-                model.addAttribute("message", "Вакансия с указанным идентификатором не найдена");
-                return "errors/404";
-            }
-            return "redirect:/";
-        } catch (Exception exception) {
-            model.addAttribute("message", exception.getMessage());
+        var isUpdated = simpleTaskService.update(task);
+        if (!isUpdated) {
+            model.addAttribute("message", "Вакансия с указанным идентификатором не найдена");
             return "errors/404";
         }
+        return "redirect:/";
     }
 
     @GetMapping("/delete/{id}")
     public String delete(Model model, @PathVariable int id) {
-        var isDeleted = taskService.deleteById(id);
+        var isDeleted = simpleTaskService.deleteById(id);
         if (!isDeleted) {
             model.addAttribute("message", "Задание с указанным идентификатором не найдено");
             return "errors/404";
@@ -78,16 +69,9 @@ public class TaskController {
 
     @GetMapping("/complete/{id}")
     public String complete(Model model, @PathVariable int id) {
-        var optionalTask = taskService.findById(id);
-        if (optionalTask.isEmpty()) {
-            model.addAttribute("message", "Задание с указанным идентификатором не найдено");
-            return "errors/404";
-        }
-        var task = optionalTask.get();
-        task.setDone(true);
-        var isUpdated = taskService.update(task);
-        if (!isUpdated) {
-            model.addAttribute("message", "Задание с указанным идентификатором не найдено");
+        var completed = simpleTaskService.complete(id);
+        if (!completed) {
+            model.addAttribute("message", "Вакансия с указанным идентификатором не найдена");
             return "errors/404";
         }
         model.addAttribute("message", "Задание выполнено");
