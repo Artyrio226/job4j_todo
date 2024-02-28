@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
-import ru.job4j.todo.service.SimpleTaskService;
+import ru.job4j.todo.service.task.SimpleTaskService;
 
 @Controller
 @AllArgsConstructor
@@ -22,7 +22,7 @@ public class TaskController {
     @PostMapping("/create")
     public String create(@ModelAttribute Task task) {
         simpleTaskService.save(task);
-        return "redirect:/";
+        return "redirect:/index";
     }
 
     @GetMapping("/{id}")
@@ -54,7 +54,7 @@ public class TaskController {
             model.addAttribute("message", "Вакансия с указанным идентификатором не найдена");
             return "errors/404";
         }
-        return "redirect:/";
+        return "redirect:/index";
     }
 
     @GetMapping("/delete/{id}")
@@ -64,7 +64,7 @@ public class TaskController {
             model.addAttribute("message", "Задание с указанным идентификатором не найдено");
             return "errors/404";
         }
-        return "redirect:/";
+        return "redirect:/index";
     }
 
     @GetMapping("/complete/{id}")

@@ -4,18 +4,18 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.job4j.todo.service.SimpleTaskService;
+import ru.job4j.todo.service.task.SimpleTaskService;
 
 @Controller
 @AllArgsConstructor
-@RequestMapping("/")
+@RequestMapping({"/", "index"})
 public class IndexController {
     private final SimpleTaskService simpleTaskService;
 
     @GetMapping
     public String getAll(Model model) {
         model.addAttribute("tasks", simpleTaskService.findAll());
-        return "/list";
+        return "index";
     }
 
     @GetMapping("/completed")

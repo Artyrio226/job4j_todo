@@ -3,9 +3,17 @@
     <div class="container">
       <div class="collapse navbar-collapse">
         <div class="navbar-nav me-auto">
-          <a class="nav-item nav-link active" href="/">Все</a>
+          <a class="nav-item nav-link active" href="/index">Все</a>
           <a class="nav-item nav-link active" th:href="@{/completed(done=true)}">Выполненные</a>
           <a class="nav-item nav-link active" th:href="@{/new(done=false)}">Новые</a>
+        </div>
+        <div class="d-flex" th:if="${user.name == 'Гость'}">
+          <a class="nav-link text-secondary me-3" th:href="@{/users/register}">Регистрация</a>
+          <a class="nav-link text-secondary" th:href="@{/users/login}">Войти</a>
+        </div>
+        <div class="d-flex" th:if="${user.name != 'Гость'}">
+          <a class="nav-link text-secondary me-3" href="#" th:text="${user.name}"></a>
+          <a class="nav-link text-secondary" th:href="@{/users/logout}">Выйти</a>
         </div>
       </div>
     </div>
