@@ -18,7 +18,7 @@ public class HibernateTaskStore implements TaskStore {
     @Override
     public Task save(Task task) {
         try {
-            crudRepository.run(session -> session.save(task));
+            crudRepository.run(session -> session.persist(task));
         } catch (Exception e) {
             LOG.error("Ошибка при попытке сохранить задание", e);
         }
