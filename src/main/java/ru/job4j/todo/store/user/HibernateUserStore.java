@@ -7,7 +7,6 @@ import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.store.task.HibernateTaskStore;
 
@@ -22,14 +21,14 @@ public class HibernateUserStore implements UserStore {
     @Override
     public Optional<User> save(User user) {
         Session session = sf.openSession();
-        var optionalUser = Optional.of(user);
+        Optional<User> optionalUser = Optional.empty();
         try {
             session.beginTransaction();
             session.save(user);
             session.getTransaction().commit();
+            optionalUser = Optional.of(user);
         } catch (Exception e) {
             session.getTransaction().rollback();
-            optionalUser = Optional.empty();
             LOG.error("Ошибка при попытке зарегистрировать пользователя", e);
         } finally {
             session.close();
