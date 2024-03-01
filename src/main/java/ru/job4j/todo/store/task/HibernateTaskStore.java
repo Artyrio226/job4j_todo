@@ -60,7 +60,7 @@ public class HibernateTaskStore implements TaskStore {
     public List<Task> findAll() {
         List<Task> list = new ArrayList<>();
         try {
-            list = crudRepository.query("from Task", Task.class);
+            list = crudRepository.query("FROM Task f JOIN FETCH f.priority", Task.class);
         } catch (Exception e) {
             LOG.error("Ошибка при попытке найти список заданий", e);
         }
@@ -71,7 +71,7 @@ public class HibernateTaskStore implements TaskStore {
     public Optional<Task> findById(int id) {
         Optional<Task> optionalTask = Optional.empty();
         try {
-            optionalTask = crudRepository.optional("from Task where id = :fId", Task.class, Map.of("fId", id));
+            optionalTask = crudRepository.optional("FROM Task f JOIN FETCH f.priority where id = :fId", Task.class, Map.of("fId", id));
         } catch (Exception e) {
             LOG.error("Ошибка при попытке  найти задание", e);
         }
