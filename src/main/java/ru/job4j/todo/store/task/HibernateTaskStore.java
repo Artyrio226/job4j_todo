@@ -27,20 +27,9 @@ public class HibernateTaskStore implements TaskStore {
 
     @Override
     public boolean update(Task task) {
-        boolean rsl = false;
-        try {
-            rsl = crudRepository.execute("""
-                    UPDATE Task
-                     SET title = :fTitle, description = :fDescription, done = :fDone
-                     WHERE id = :fId
-                    """, Map.of(
-                            "fTitle", task.getTitle(),
-                            "fDescription", task.getDescription(),
-                            "fDone", task.isDone(),
-                            "fId", task.getId())
-            );
-        } catch (Exception e) {
-            LOG.error("Ошибка при попытке обновить задание", e);
+        boolean rsl = crudRepository.run(session -> session.merge(task));
+         if (!rsl) {
+            LOG.error("Ошибка при попытке обновить задание");
         }
         return rsl;
     }
@@ -71,7 +60,8 @@ public class HibernateTaskStore implements TaskStore {
     public Optional<Task> findById(int id) {
         Optional<Task> optionalTask = Optional.empty();
         try {
-            optionalTask = crudRepository.optional("FROM Task f JOIN FETCH f.priority where id = :fId", Task.class, Map.of("fId", id));
+            optionalTask = crudRepository.optional("FROM Task f JOIN FETCH f.priority JOIN FETCH f.participates where f.id = :fId",
+                    Task.class, Map.of("fId", id));
         } catch (Exception e) {
             LOG.error("Ошибка при попытке  найти задание", e);
         }
@@ -82,7 +72,8 @@ public class HibernateTaskStore implements TaskStore {
     public Collection<Task> findByDone(boolean done) {
         List<Task> list = new ArrayList<>();
         try {
-            list = crudRepository.query("from Task where done = :fDone", Task.class, Map.of("fDone", done));
+            list = crudRepository.query("FROM Task f JOIN FETCH f.priority where done = :fDone",
+                    Task.class, Map.of("fDone", done));
         } catch (Exception e) {
             LOG.error("Ошибка при попытке найти список заданий по принципу новые и выполненные", e);
         }
@@ -94,7 +85,7 @@ public class HibernateTaskStore implements TaskStore {
         boolean rsl = false;
         try {
             rsl = crudRepository.execute("UPDATE Task SET done = :fDone WHERE id = :fId",
-                     Map.of("fDone", true, "fId", id));
+                    Map.of("fDone", true, "fId", id));
         } catch (Exception e) {
             LOG.error("Ошибка при попытке выполнить задание", e);
         }

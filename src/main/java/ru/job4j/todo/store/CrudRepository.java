@@ -18,12 +18,18 @@ import java.util.function.Function;
 public class CrudRepository {
     private final SessionFactory sf;
 
-    public void run(Consumer<Session> command) {
-        tx(session -> {
-                    command.accept(session);
-                    return null;
-                }
-        );
+    public boolean run(Consumer<Session> command) {
+        try {
+            tx(session -> {
+                        command.accept(session);
+                        return null;
+                    }
+            );
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void run(String query, Map<String, Object> args) {
@@ -38,7 +44,7 @@ public class CrudRepository {
         run(command);
     }
 
-    public <T> boolean execute(String query, Map<String, Object> args) {
+    public boolean execute(String query, Map<String, Object> args) {
         Function<Session, Boolean> command = session -> {
             var sq = session
                     .createQuery(query);
